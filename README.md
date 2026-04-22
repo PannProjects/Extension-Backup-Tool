@@ -39,3 +39,13 @@ Utilitas Windows GUI ringan untuk mencadangkan (backup) ekstensi dari berbagai I
 3. Pilih IDE Anda dan klik **Mulai Backup**.
 
 *(Catatan: Jika program Antivirus Anda memblokir file `.exe` karena false positive, Anda tetap bisa menjalankan file mentah `script.ps1` dari repositori ini).*
+
+---
+
+## 📝 Changelog
+
+### v1.1
+- **[EN] Fixed UI Freezing**: Converted synchronous download processes to asynchronous tasks. The application will no longer go into "Not Responding" state during heavy extension downloads.
+- **[ID] Perbaikan UI Freeze**: Mengubah proses unduhan sinkron menjadi tugas asinkron. Aplikasi tidak akan lagi masuk ke status "Not Responding" saat mengunduh ekstensi yang berat.
+- **[EN] Improved Responsiveness**: Added UI event pumping (`DoEvents`) during directory scanning and rate-limit delays to keep the window fully interactive.
+- **[ID] Peningkatan Responsivitas UI**: Menambahkan pemrosesan *event* UI (`DoEvents`) saat pemindaian folder dan jeda *rate-limit* untuk menjaga jendela aplikasi tetap interaktif.
