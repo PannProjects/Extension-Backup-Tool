@@ -5,7 +5,7 @@
 ---
 
 <a id="-english"></a>
-## 🇬🇧 English
+## EN English
 
 A lightweight, powerful, and responsive Windows GUI utility designed to backup extensions from various VS Code-based IDEs directly from your local environment. 
 
@@ -37,7 +37,7 @@ Some antivirus programs or Windows Defender may flag PowerShell scripts compiled
 ---
 
 <a id="-bahasa-indonesia"></a>
-## 🇮🇩 Bahasa Indonesia
+## ID Bahasa Indonesia
 
 Sebuah utilitas Windows GUI yang ringan, responsif, dan tangguh, dirancang untuk mencadangkan (backup) ekstensi dari berbagai IDE berbasis VS Code langsung dari lingkungan lokal Anda.
 
