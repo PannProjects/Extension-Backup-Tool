@@ -175,6 +175,7 @@ function Get-ExtensionsFromDir($extDir) {
     if (Test-Path $extDir) {
         $folders = Get-ChildItem -Path $extDir -Directory
         foreach ($folder in $folders) {
+            [System.Windows.Forms.Application]::DoEvents()
             if ($folder.Name.StartsWith(".")) { continue } 
             
             $pkgPath = Join-Path $folder.FullName "package.json"
@@ -300,14 +301,44 @@ $btnStart.Add_Click({
             try {
                 $parts = $ext -split '\.', 2
                 $url = "https://$($parts[0]).gallery.vsassets.io/_apis/public/gallery/publisher/$($parts[0])/extension/$($parts[1])/latest/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
-                Invoke-WebRequest -Uri $url -OutFile (Join-Path $sub "$ext.vsix") -UseBasicParsing -TimeoutSec 30
-                $txtLog.AppendText("OK`r`n")
+                $outFile = Join-Path $sub "$ext.vsix"
                 
-                # Jeda untuk mencegah Rate Limiting (HTTP 429)
-                Start-Sleep -Milliseconds 250
+                $client = New-Object System.Net.WebClient
+                $client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) PowerShell")
+                $uri = New-Object System.Uri($url)
+                
+                $task = $client.DownloadFileTaskAsync($uri, $outFile)
+                
+                while (-not $task.IsCompleted) {
+                    if ($global:isStopping) { 
+                        $client.CancelAsync()
+                        break 
+                    }
+                    [System.Windows.Forms.Application]::DoEvents()
+                    Start-Sleep -Milliseconds 50
+                }
+                
+                $client.Dispose()
+                
+                if ($global:isStopping) { break }
+                
+                if ($task.Status -eq [System.Threading.Tasks.TaskStatus]::RanToCompletion) {
+                    $txtLog.AppendText("OK`r`n")
+                } elseif ($task.IsFaulted) {
+                    throw $task.Exception.InnerException
+                }
+                
+                # Jeda untuk mencegah Rate Limiting (HTTP 429), dengan DoEvents
+                for ($j = 0; $j -lt 5; $j++) {
+                    if ($global:isStopping) { break }
+                    [System.Windows.Forms.Application]::DoEvents()
+                    Start-Sleep -Milliseconds 50
+                }
             } catch {
                 $txtLog.SelectionColor = $logError
-                $txtLog.AppendText("FAIL ($($_.Exception.Message))`r`n")
+                $errMsg = $_.Exception.Message
+                if ($null -ne $_.Exception.InnerException) { $errMsg = $_.Exception.InnerException.Message }
+                $txtLog.AppendText("FAIL ($errMsg)`r`n")
                 $txtLog.SelectionColor = $logSuccess
             }
         }
